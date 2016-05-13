@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" applicationComplete="create()" width="100%" height="100%">
+		 
+	<fx:Style source="styles.css"/>
+	<fx:Script>
+		<![CDATA[
+			import flash.media.Video;
+			import flash.sensors.Accelerometer;
+			
+			import mx.core.FlexGlobals;
+			import mx.effects.Move;
+			import mx.effects.easing.Bounce;
+			import mx.effects.easing.Linear;
+			import mx.events.EffectEvent;
+			import mx.events.ResizeEvent;
+			
+			import components.CustomClient;
+			import components.CustomSocket;
+ 
+		 
+			//	private var videoURL:String = "livestream";
+			//		private var videoURL:String = "rsc1";
+			//	private var videoURL:String = "hello";	
+			private var video:flash.media.Video=new flash.media.Video;  
+			private var connection:NetConnection;
+			private var stream:NetStream;
+			
+		 
+			private	var mov:Move = new Move();
+			private var accelerometer:Accelerometer; 
+			private var useSocket:CustomSocket;
+			[Bindable]
+			private var textStr:String="hello";
+			private function remove_Handle():void{
+				this.removeEventListener(ResizeEvent.RESIZE,resize_Handle,false);
+			}
+			public function SWFLoad():Boolean
+			{
+				return true;
+			}
+			private function create():void
+			{
+				ExternalInterface.addCallback("playVideo",playVideo);
+				ExternalInterface.addCallback("stopPlay",stopPlay);
+				ExternalInterface.addCallback("SWFLoad",SWFLoad);
+				load_video();
+			 	this.addEventListener(ResizeEvent.RESIZE,resize_Handle,false,0,true);
+				//navigateToURL(new URLRequest("rtmp://fmsvideo.p5w.net:1935"), "_blank");
+				textStr+="create()";
+				
+				trace("create()");
+			}
+		 
+			private function load_video():void{
+				
+				connection = new NetConnection();
+				connection.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler,false,0,true);
+				connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler,false,0,true);
+				connect_Handle();
+				
+				//	connection.connect("rtmp://192.168.0.161:1935/SOSample");
+				connection.client=this;
+				textStr+="load_video()";
+				trace("load_video()");
+				
+			}
+			private function connect_Handle():void{
+				 
+			 
+				//connection.connect("rtmp://fmsvideo.p5w.net:1935/live");
+				connection.connect(null);
+				textStr+="connect_Handle()";
+				trace("connect_Handle()");
+			}
+		 
+			
+			private function netStatusHandler(event:NetStatusEvent):void {
+				//trace("event.info.code"+event.info.code);
+				textStr+="netStatusHandler";
+				trace("netStatusHandler");
+				//	lb.text+=String(event.info.code)+"\n";
+				switch (event.info.code) {
+					case "NetConnection.Connect.Success":
+						connectStream();
+						break;
+					case "NetStream.Play.StreamNotFound":
+						trace("Stream not found: " );
+						break;
+				}
+				ExternalInterface.call("getstate", event.info.code);
+			}
+			private function securityErrorHandler(event:SecurityErrorEvent):void {
+				trace("securityErrorHandler: " + event);
+			}
+			
+			private function connectStream():void {
+				if(!ui.contains(video))
+				{
+					ui.addChild(video);
+					video.width=ui.width;
+					video.height=ui.height;
+				    video.smoothing=true;
+				}
+				
+				stream = new NetStream(connection);
+				stream.addEventListener(NetStatusEvent.NET_STATUS, netStatusHandler,false,0,true);
+				stream.client = new CustomClient;
+				stream.bufferTime=0;
+			//	stream.useJitterBuffer=true;
+			 	video.attachNetStream(stream);
+				
+				textStr+="+++videoStream";
+				 
+				//stream.play("http://192.0.0.152:9015/livestream");
+				 
+			}
+			public function playVideo(streamUrl:String):void
+			{
+				if(stream)
+				{
+					stream.play(streamUrl);
+				}
+			}
+			public function stopPlay():void
+			{
+				if(stream)
+				{
+					stream.close();
+				}
+			}
+			private function stageVideoStateChange(event:StageVideoEvent):void {
+				var status:String = event.status; 
+				//trace("status"+status+","+sv.videoWidth+","+sv.videoHeight);
+			}
+			private function resize_Handle(evt:ResizeEvent):void{
+				video.width=ui.width;
+				video.height=ui.height;
+			}
+			public function onBWDone(... rest):void{
+				var p_bw:Number=0;
+				if (rest.length > 0) p_bw = rest[0];
+				//	trace("bandwidth = " + p_bw + " Kbps.");
+			}
+			
+			public function onBWCheck(... rest):void{
+				trace(onBWCheck);
+			}
+		]]>
+	</fx:Script>
+	
+	<s:BorderContainer backgroundAlpha="0" id="bc" x="0" y="0" borderWeight="0" borderVisible="false" borderAlpha="0"  backgroundColor="#000000"       width="{this.width}" height="{this.height}" horizontalCenter="0" verticalCenter="0">
+		<mx:UIComponent      horizontalCenter="0" verticalCenter="0" id="ui" width="100%" height="100%"/>
+		<!--s:Image horizontalCenter="0" verticalCenter="0"  source="assets/border.png" smooth="true" width="100%" height="100%" scaleMode="stretch"/-->
+		
+		 
+	</s:BorderContainer>
+	<s:Label id="lb" text="{textStr}" backgroundAlpha="0" horizontalCenter="0" verticalCenter="0" fontSize="30"/>
+
+</s:Application>

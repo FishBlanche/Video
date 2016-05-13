@@ -1,0 +1,27 @@
+@namespace "library://ns.adobe.com/flex/spark";
+
+
+ 
+ 
+ 
+.myButton
+{
+	disabledSkin: Embed(source="assets/buttonokSkin.png",
+		scaleGridLeft="57", scaleGridTop="22", scaleGridRight="58", scaleGridBottom="26");
+	downSkin: Embed(source="assets/buttonokSkin.png",
+		scaleGridLeft="57", scaleGridTop="22", scaleGridRight="58", scaleGridBottom="26");
+	overSkin: Embed(source="assets/buttonokSkin.png",
+		scaleGridLeft="57", scaleGridTop="22", scaleGridRight="58", scaleGridBottom="26");
+	upSkin: Embed(source="assets/buttonokSkin.png",
+		scaleGridLeft="57", scaleGridTop="22", scaleGridRight="58", scaleGridBottom="26");
+	color: #000000;
+	textRollOverColor: #000000;
+	textSelectedColor: #000000;
+	selectedUpSkin: Embed(source="assets/buttonokSkin.png", scaleGridLeft="57", scaleGridTop="22", scaleGridRight="58", scaleGridBottom="26");
+	selectedOverSkin: Embed(source="assets/buttonokSkin.png", scaleGridLeft="57", scaleGridTop="22", scaleGridRight="58", scaleGridBottom="26");
+	selectedDownSkin: Embed(source="assets/buttonokSkin.png", scaleGridLeft="57", scaleGridTop="22", scaleGridRight="58", scaleGridBottom="26");
+	disabledColor: #222626;
+    fontSize: 15;
+	fontWeight: bold;
+}
+ 
